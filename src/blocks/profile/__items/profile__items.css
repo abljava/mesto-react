@@ -1,0 +1,9 @@
+.profile__items {
+  display: flex;
+  align-items: baseline;
+}
+@media screen and (max-width: 1080px) {
+  .profile__items {
+    margin-top: 26px;
+  }
+}

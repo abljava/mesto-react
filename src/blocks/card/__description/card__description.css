@@ -1,0 +1,7 @@
+.card__description {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #000000;
+  padding: 22px 20px 19px 21px;
+}
