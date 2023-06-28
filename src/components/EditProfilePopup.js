@@ -33,7 +33,6 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
     });
   }
 
-
   return (
     <PopupWithForm
       name={'profile'}

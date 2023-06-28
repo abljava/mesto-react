@@ -8,9 +8,9 @@ import ImagePopup from './ImagePopup';
 import EditProfilePopup from './EditProfilePopup'
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup'
+import DeleteCardPopup from './DeleteCardPopup'
 import CurrentUserContext from '../contexts/CurrentUserContext'
 import { api } from '../utils/Api'
-
 
 function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
@@ -20,11 +20,11 @@ function App() {
   const [selectedCard, setSelectedCard] = useState({});
   const [currentUser, setCurrentUser] = useState({})
   const [cards, setCards] = useState([])
+  const [cardToDelete, setCardToDelete] = useState({})
 
   useEffect(() => {
     api.getCards()
       .then((dataCard) => {
-        console.log(dataCard);
         setCards(dataCard)
       })
       .catch((err) => {
@@ -35,14 +35,12 @@ function App() {
   useEffect(() => {
     api.getUserInfo()
       .then((userData) => {
-        console.log(userData);
         setCurrentUser(userData)
       })
       .catch((err) => {
         console.log(`Ошибка получения данных пользователя: `, err);
       })
   }, [])
-
 
   function handleCardClick(card) {
     setSelectedCard(card)
@@ -60,31 +58,9 @@ function App() {
     setIsAddPlacePopupOpen(true)
   }
 
-  function handleDeleteCardClick() {
+  function handleDeleteCardClick(card) {
     setIsDeletePopupOpen(true)
-  }
-
-  function handleCardLike(card) {
-    // проверяем, есть ли уже лайк на этой карточке
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
-
-    // Отправляем запрос в API и получаем обновлённые данные карточки
-    api.changeLikeCardStatus(card._id, !isLiked)
-      .then((newCard) => {
-        console.log(`new card ===>`, newCard);
-        setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
-      });
-  }
-
-  function handleCardDelete(card) {
-    api.deleteCard(card._id)
-      .then((res) => {
-        console.log(`res ===>`, res);
-        setCards((state) => state.filter((c) => {
-          return c._id !== card._id
-        }))
-
-      })
+    setCardToDelete(card)
   }
 
   function closeAllPopups() {
@@ -95,12 +71,38 @@ function App() {
     setSelectedCard({})
   }
 
+
+  function handleCardLike(card) {
+    // проверяем, есть ли уже лайк на этой карточке
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+
+    // Отправляем запрос в API и получаем обновлённые данные карточки
+    api.changeLikeCardStatus(card._id, !isLiked)
+      .then((newCard) => {
+        setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+      })
+      .catch((err) => {
+        console.log(`Ошибка установки лайка: `, err);
+      })
+  }
+
+  function handleCardDelete(card) {
+    api.deleteCard(card._id)
+      .then((res) => {
+        setCards((state) => state.filter((c) => {
+          return c._id !== card._id
+        }))
+        closeAllPopups()
+      })
+      .catch((err) => {
+        console.log(`Ошибка удаления карточки: `, err);
+      })
+  }
+
   function handleUpdateUser(data) {
     api.editUserInfo(data)
       .then((data) => {
-        console.log(`data ===>`, data);
         setCurrentUser(data)
-        console.log(`current user ===>`, currentUser);
         closeAllPopups()
       })
       .catch((err) => {
@@ -108,11 +110,9 @@ function App() {
       })
   }
 
-
   function handleUpdateAvatar(avatar) {
     api.editAvatar(avatar)
       .then((avatar) => {
-        console.log(`avatar ===>`, avatar);
         setCurrentUser(avatar)
         closeAllPopups()
       })
@@ -143,11 +143,9 @@ function App() {
               onEditAvatar={handleEditAvatarClick}
               onEditProfile={handleEditProfileClick}
               onAddPlace={handleAddPlaceClick}
-              onDeleteCardClick={handleDeleteCardClick}
+              onDeleteCardClick={card => handleDeleteCardClick(card)}
               onCardClick={card => handleCardClick(card)}
-              onCardLike={card => handleCardLike(card)}
-              onCardDelete={card => handleCardDelete(card)}
-            />
+              onCardLike={card => handleCardLike(card)} />
             <Footer />
 
             {/* Popup Profile */}
@@ -162,27 +160,23 @@ function App() {
               onClose={closeAllPopups}
               onUpdateAvatar={avatar => handleUpdateAvatar(avatar)} />
 
-
             {/* Popup Place */}
             <AddPlacePopup
               isOpen={isAddPlacePopupOpen}
               onClose={closeAllPopups}
               onAddPlace={data => handleAddPlaceSubmit(data)} />
 
-
             {/* Popup Delete */}
-            <PopupWithForm
-              name={'delete'}
-              title={'Вы уверены?'}
-              buttonText={'Да'}
+            <DeleteCardPopup
+              card={cardToDelete}
               isOpen={isDeletePopupOpen}
-              onClose={closeAllPopups} />
+              onClose={closeAllPopups}
+              onDeleteCard={card => handleCardDelete(card)} />
 
             {/* Popup Image */}
             <ImagePopup
               card={selectedCard}
-              onClose={closeAllPopups}
-            />
+              onClose={closeAllPopups} />
           </div>
         </div>
       </div>
