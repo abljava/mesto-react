@@ -1,6 +1,3 @@
-//Токен: bdd7ce0d-60a1-4216-8ef2-96be2af5cc6f
-//Идентификатор группы: cohort-66"
-
 class Api {
   constructor(params) {
     this._baseUrl = params.baseUrl;
@@ -10,10 +7,10 @@ class Api {
 
   _getResponseData(res) {
     if (!res.ok) {
-        return Promise.reject(`Ошибка: ${res.status}`); 
+      return Promise.reject(`Ошибка: ${res.status}`);
     }
     return res.json();
-}
+  }
 
   addNewCard(data) {
     return fetch('https://mesto.nomoreparties.co/v1/cohort-66/cards', {
@@ -36,7 +33,7 @@ class Api {
         authorization: this._token
       }
     })
-    .then(res => this._getResponseData(res))
+      .then(res => this._getResponseData(res))
   }
 
   getUserInfo() {
@@ -45,7 +42,7 @@ class Api {
         authorization: this._token
       }
     })
-    .then(res => this._getResponseData(res))
+      .then(res => this._getResponseData(res))
   }
 
   deleteCard(cardId) {
@@ -55,7 +52,7 @@ class Api {
         authorization: this._token,
       }
     })
-    .then(res => this._getResponseData(res))
+      .then(res => this._getResponseData(res))
   }
 
   editUserInfo(data) {
@@ -70,7 +67,7 @@ class Api {
         about: data.about,
       }),
     })
-    .then(res => this._getResponseData(res))
+      .then(res => this._getResponseData(res))
   }
 
   editAvatar(avatar) {
@@ -82,7 +79,7 @@ class Api {
       },
       body: JSON.stringify(avatar),
     })
-    .then(res => this._getResponseData(res))
+      .then(res => this._getResponseData(res))
   }
 
   addLike(cardId) {
@@ -92,7 +89,7 @@ class Api {
         authorization: this._token,
       },
     })
-    .then(res => this._getResponseData(res))
+      .then(res => this._getResponseData(res))
   }
 
   deleteLike(cardId) {
@@ -102,7 +99,14 @@ class Api {
         authorization: this._token,
       },
     })
-    .then(res => this._getResponseData(res))
+      .then(res => this._getResponseData(res))
+  }
+
+  changeLikeCardStatus(cardId, isLiked) {
+    if (isLiked) {
+      return api.addLike(cardId)
+    }
+    return api.deleteLike(cardId)
   }
 }
 
