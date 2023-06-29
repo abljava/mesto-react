@@ -26,6 +26,7 @@ function App() {
     api.getCards()
       .then((dataCard) => {
         setCards(dataCard)
+        console.log(dataCard);
       })
       .catch((err) => {
         console.log(`Ошибка получения карточек: `, err);

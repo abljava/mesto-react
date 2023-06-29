@@ -34,9 +34,6 @@ function Main({
               return <Card
                 card={item}
                 key={item._id}
-                likes={item.likes.length}
-                name={item.name}
-                link={item.link}
                 onCardClick={onCardClick}
                 onDeleteCardClick={onDeleteCardClick}
                 onCardLike={onCardLike}
